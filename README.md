@@ -1,79 +1,34 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+This is **UNOFFICIAL** client for corview.cloud web application for mobile devices.
 
-# Getting Started
+## Stack:
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+React-Native 0.74.3 + TypeScript
 
-## Step 1: Start the Metro Server
+Redux + Toolkit
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+react-native-quick-crypto for PKCE code geneartion
 
-To start Metro, run the following command from the _root_ of your React Native project:
+React Native UI Kitten
 
-```bash
-# using npm
-npm start
+## App
 
-# OR using Yarn
-yarn start
-```
+The app is available in Google Play Store - [RMU Commander](https://)
 
-## Step 2: Start your Application
+## Usage
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+RMU commander allows to send On/Of/ContinuousInterruption commands to Mobiltex's Remote Monitoring Units (works with RMU3).
 
-### For Android
 
-```bash
-# using npm
-npm run android
+## Features
+ - **Fast and simple** - quick and reliable way to send comands from the device in field.
 
-# OR using Yarn
-yarn android
-```
+ - **Auto-login and Save password** - login once and have your credentials stored on device in encrypted storage.
+ - **No more "Send Verification e-mail"** - seriously, it is annoying...
+ - **Save interruption configurations** - create configurations with On/Off cycles and use them to send interruption commands, without entering cycle time every time.
+ - **Adaptive time selection** - select desired duration of interruption instead of typing start and end dates.
 
-### For iOS
+## Limitations
 
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- Only supporting Continuous Interruption, Turn On and Turn Off commands.
+- You can only send commands and see site and command status updates. To view sites' data use the official web app.
+- Even though it's written in RN, there is currently no way to upload it to AppStore anyways.
