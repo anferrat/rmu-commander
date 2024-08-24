@@ -1,17 +1,11 @@
 import React from 'react'
-import { View, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { Button, CheckBox, Input, Layout, Text } from '@ui-kitten/components'
-import { login } from '../../app/controllers/controller';
 import { useLoginScreen } from './hooks/useLoginScreen';
+import LoadingView from './components/LoadingView';
 
 
-interface LoginProps {
-    // Define your props here
-}
-
-
-function Login({ }: LoginProps): React.JSX.Element {
-
+function Login(): React.JSX.Element {
     const {
         username,
         password,
@@ -66,6 +60,8 @@ function Login({ }: LoginProps): React.JSX.Element {
                 style={styles.button}>
                 Login
             </Button>
+            <LoadingView
+                loading={loading || loggingIn} />
         </Layout>
     );
 }

@@ -30,9 +30,7 @@ function TimeSelectModal({ }: TimeSelectModalProps): React.JSX.Element {
                     <TimeSelectionListItem
                         key={timeFrame.timeSelectionOption}
                         timeFrame={timeFrame}
-                        onSelect={onSelect}
-                    />
-
+                        onSelect={onSelect} />
                 )}
                 {loading ? <LoadingView /> : null}
             </Layout>

@@ -15,8 +15,7 @@ function ItemLoadingView({ loading }: ItemLoadingViewProps): React.JSX.Element {
                 style={styles.container}>
                 <ActivityIndicator
                     size={'large'}
-                    color={theme['color-basic-400']}
-                />
+                    color={theme['color-basic-400']} />
             </Layout>
         )
     else return <></>
@@ -29,7 +28,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.3)'
+        backgroundColor: 'rgba(0,0,0,0.4)'
     }
 });
 

@@ -14,8 +14,12 @@ export const useApp = () => {
             const { isOk, response } = await initializeApp()
             if (isOk) {
                 dispatch(setIsLoggedIn(response!))
+                if (!response!)
+                    setIsLoading(false)
             }
-            setIsLoading(false)
+            else {
+                setIsLoading(false)
+            }
         }
         loadData()
     }, [])
@@ -31,6 +35,7 @@ export const useApp = () => {
                         userId: response?.userId,
                         defaultCompanyId: response?.defaultCompanyId
                     }))
+                setIsLoading(false)
             }
             loadData()
         }
