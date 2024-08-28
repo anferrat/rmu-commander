@@ -12,13 +12,14 @@ import { Company } from "../entities/corview.cloud/Company"
 import { Site } from "../entities/corview.cloud/Site"
 import { Group } from "../entities/corview.cloud/Group"
 import { CommandStatePayload } from "../entities/corview.cloud/CommandStatePayload"
-import { CommandState } from "../entities/corview.cloud/CommandState"
-import { CommandStatus, SiteStatus } from "../../constants/constants"
+import { SiteStatus } from "../../constants/constants"
 import { SiteStatePayload } from "../entities/corview.cloud/SiteStatePayload"
 import { SiteState } from "../entities/corview.cloud/SiteState"
 import { SendCommandPayload } from "../entities/corview.cloud/SendCommandPayload"
+import { CommandHistoryResponse, CommandStateResponseProcessor } from "../utils/AxiosResponseProcessors/CommandStateResponseProcessor"
+import { SiteStateResponse, SiteStateResponseProcessor } from "../utils/AxiosResponseProcessors/SiteStateResponseProcessor"
 
-interface CompanyResponse {
+export interface CompanyResponse {
     data: {
         id: string,
         name: string
@@ -28,7 +29,7 @@ interface CompanyResponse {
     nextPageLink: any
 }
 
-interface SiteResponse {
+export interface SiteResponse {
     data: {
         hardwareType: {
             id: string
@@ -43,7 +44,7 @@ interface SiteResponse {
     }[]
 }
 
-interface GroupResponse {
+export interface GroupResponse {
     data: {
         groupType: {
             id: string,
@@ -54,45 +55,15 @@ interface GroupResponse {
     }[]
 }
 
-interface CommandHistoryResponse {
-    data: {
-        success: boolean,
-        doneMessage: string,
-        doneDate: string
-    }[],
-    total: number
-}
 
-interface SiteStateResponse {
-    data: {
-        id: string,
-        name: string
-        company: {
-            id: string
-        },
-        group: {
-            id: string,
-            displayName: string
-        }
-        lastReading: {
-            rmuInterruptStatus: {
-                id: string
-            }
-        },
-        lastInterruptMsgCommand: {
-            interruptCycleTimeMs: number | null,
-            interruptOffTimeMs: number | null
-        },
-        interruptCycleOrder: {
-            id: string
-        }
 
-    }[]
-}
+
 
 
 
 export class AxiosRepository {
+    commandStateResponseProcessor = new CommandStateResponseProcessor()
+    siteStateResponseProcessor = new SiteStateResponseProcessor()
     AUTHORIZATION_ENDPOINT: string = 'https://account.corview.cloud/connect/authorize'
     TOKEN_ENDPOINT: string = 'https://account.corview.cloud/connect/token'
     END_SESSION_ENDPOINT: string = 'https://account.corview.cloud/connect/endsession'
@@ -238,12 +209,12 @@ export class AxiosRepository {
                 url: 'http://worldtimeapi.org/api/timezone/Etc/UTC',
             })
             if (data.unixtime)
-                return data.unixtime
+                return data.unixtime * 1000
             else
                 throw 'oops'
         }
         catch (er) {
-            return Math.floor(Date.now() / 1000)
+            return Date.now()
         }
     }
 
@@ -253,15 +224,6 @@ export class AxiosRepository {
     2. GroupRequest - gets the list of standard and iterruption groups
     3. SiteRequest - gets the list of all the sites
     */
-
-    private _getDate(dateString: string) {
-        try {
-            return new Date(dateString).getTime()
-        }
-        catch (er) {
-            return Date.now()
-        }
-    }
 
     async userInfo(accessToken: AccessToken): Promise<UserInfo> {
         try {
@@ -342,11 +304,11 @@ export class AxiosRepository {
         }
     }
 
-    async commandStateRequest(accessToken: AccessToken, commandStatusPayload: CommandStatePayload) {
+    async commandStateRequest(accessToken: AccessToken, commandStatePayload: CommandStatePayload) {
         try {
             const { data, headers } = await axios<any, AxiosResponse<CommandHistoryResponse>>({
                 method: 'get',
-                url: `https://api.corview.cloud/v1/MsgCommand/GetCommandHistory?${commandStatusPayload.toString()}`,
+                url: `https://api.corview.cloud/v1/MsgCommand/GetCommandHistory?${commandStatePayload.toString()}`,
                 headers: {
                     'Authorization': `Bearer ${accessToken.token}`,
                     'Host': 'api.corview.cloud',
@@ -354,18 +316,7 @@ export class AxiosRepository {
                     'Connection': 'keep-alive'
                 }
             })
-            const timestamp = this._getDate(headers['date'])
-            if (data.total === 0)
-                return new CommandState(commandStatusPayload.siteId, commandStatusPayload.companyId, '', CommandStatus.NO_COMMAND, 0, timestamp)
-            else {
-                const response = data.data[0]
-                if (response.success)
-                    return new CommandState(commandStatusPayload.siteId, commandStatusPayload.companyId, response.doneMessage, CommandStatus.DONE_CONFIRMED, new Date(response.doneDate).getTime(), timestamp)
-                else if (response.doneDate === null)
-                    return new CommandState(commandStatusPayload.siteId, commandStatusPayload.companyId, response.doneMessage, CommandStatus.AWAIT_CONFIRM, 0, timestamp)
-                else
-                    return new CommandState(commandStatusPayload.siteId, commandStatusPayload.companyId, response.doneMessage, CommandStatus.DONE_NO_CONFIRM, new Date(response.doneDate).getTime(), timestamp)
-            }
+            return this.commandStateResponseProcessor.execute(commandStatePayload, data, headers)
         }
         catch (er) {
             throw new Error('Unable to get command status')
@@ -374,38 +325,6 @@ export class AxiosRepository {
 
     async siteStateRequest(accessToken: AccessToken, siteStatePayload: SiteStatePayload) {
         try {
-            const getCycleTimes = (lastIntCommandMsg: { interruptCycleTimeMs: number | null, interruptOffTimeMs: number | null }) => {
-                try {
-                    if (lastIntCommandMsg.interruptCycleTimeMs && lastIntCommandMsg.interruptOffTimeMs && lastIntCommandMsg.interruptCycleTimeMs !== null && lastIntCommandMsg.interruptOffTimeMs !== null)
-                        return {
-                            on: lastIntCommandMsg.interruptCycleTimeMs - lastIntCommandMsg.interruptOffTimeMs,
-                            off: lastIntCommandMsg.interruptOffTimeMs
-                        }
-                    else throw 'oops'
-                }
-                catch {
-                    return {
-                        on: null,
-                        off: null
-                    }
-                }
-            }
-
-            const getStatus = (statusId: string) => {
-                switch (statusId) {
-                    case 'JustOn':
-                    case 'On':
-                        return SiteStatus.ON
-                    case 'Off':
-                    case 'JustOff':
-                        return SiteStatus.OFF
-                    case 'OnCycling':
-                        return SiteStatus.INT
-                    default:
-                        throw '100'
-                }
-            }
-
             const { data } = await axios<any, AxiosResponse<SiteStateResponse>>({
                 method: 'get',
                 url: `https://api.corview.cloud/v1/SiteStatus?${siteStatePayload.toString()}`,
@@ -416,11 +335,7 @@ export class AxiosRepository {
                     'Connection': 'keep-alive'
                 }
             })
-            const response = data.data[0]
-            const { on, off } = getCycleTimes(response.lastInterruptMsgCommand)
-            const onFirst = response.interruptCycleOrder.id !== 'OffFirst'
-            const status = getStatus(response.lastReading.rmuInterruptStatus.id)
-            return new SiteState(response.id, response.company.id, status, response.name, response.group.displayName, on, off, onFirst, response.group.id)
+            return this.siteStateResponseProcessor.execute(data)
         }
         catch (er) {
             if (er === '100')
@@ -440,11 +355,12 @@ export class AxiosRepository {
                     'Authorization': `Bearer ${accessToken.token}`,
                     'Host': 'api.corview.cloud',
                     'Origin': 'https://corview.cloud',
-                    'Connection': 'keep-alive'
+                    'Connection': 'keep-alive',
+                    'Content-Type': 'application/json'
                 },
                 data: sendCommandPayload.toString()
             })
-               }
+        }
         catch (er) {
             throw new Error('Unable to send command to RMU')
         }

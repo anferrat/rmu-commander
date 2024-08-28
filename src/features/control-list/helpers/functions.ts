@@ -14,7 +14,8 @@ export const convertDataToStateValues = (commandState: CommandState, siteState: 
         doneMessage: message,
         on: isInterrupting ? on : null,
         off: isInterrupting ? off : null,
-        onFirst
+        onFirst,
+        commandType: commandState.commandType
     }
 }
 

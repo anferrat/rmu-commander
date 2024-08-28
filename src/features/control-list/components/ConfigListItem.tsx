@@ -39,6 +39,7 @@ function ConfigListItem({ siteId, companyId, configName, configOn, configOff, co
         updating,
         status,
         autoUpdate,
+        commandType,
         onConnect,
         onInterrupt,
         onTurnOn,
@@ -82,6 +83,7 @@ function ConfigListItem({ siteId, companyId, configName, configOn, configOff, co
                 </View>
             </View>
             <StatusView
+                commandType={commandType}
                 status={status}
                 doneMessage={doneMessage}
                 updating={updating} />

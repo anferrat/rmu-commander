@@ -1,17 +1,18 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
-import { SiteStatus } from '../../../../constants/constants';
+import { SendCommandTypes, SiteStatus } from '../../../../constants/constants';
 import { Text } from '@ui-kitten/components';
 import { SiteStatusStatuses } from '../../../../constants/colors';
-import { SiteStatusLabels } from '../../../../constants/labels';
+import { SendCommanTypeLabels, SiteStatusLabels } from '../../../../constants/labels';
 
 interface StatusViewProps {
     status: SiteStatus | null,
     doneMessage: string
     updating: boolean
+    commandType: SendCommandTypes | null
 }
 
-function StatusView({ status, doneMessage, updating }: StatusViewProps): React.JSX.Element {
+function StatusView({ status, doneMessage, updating, commandType }: StatusViewProps): React.JSX.Element {
     if (status === null)
         return <></>
     else return (
@@ -27,6 +28,15 @@ function StatusView({ status, doneMessage, updating }: StatusViewProps): React.J
                     status={SiteStatusStatuses[status]}>
                     {SiteStatusLabels[status]}
                 </Text>
+                {
+                    commandType !== null && status === SiteStatus.AWT ?
+                        <Text
+                            style={styles.desc}
+                            appearance='hint'
+                            category='s2'>
+                            ({SendCommanTypeLabels[commandType]})
+                        </Text> : null
+                }
             </View>
             {doneMessage !== '' && !updating ?
                 <View
@@ -62,6 +72,9 @@ const styles = StyleSheet.create({
     },
     container: {
         marginBottom: 12
+    },
+    desc: {
+        marginLeft: 6
     }
 });
 

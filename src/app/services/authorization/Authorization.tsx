@@ -57,7 +57,8 @@ export class Authorization {
                     this.axiosRepo.getTimestamp()
                 ])
                 const { exp, nbf } = accessToken.decode()
-                if (!(timestamp > nbf && timestamp < (exp - this.NETWORK_LAG))) {
+                const timeInSec = timestamp / 1000
+                if (!(timeInSec > nbf && timeInSec < (exp - this.NETWORK_LAG))) {
                     //Token expired
                     //try to get new token with current credentials
                     await this.secureStorageRepo.removeAccessToken()

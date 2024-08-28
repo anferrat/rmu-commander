@@ -16,13 +16,11 @@ export class TestForDevOnly {
 
 
     async execute() {
-        this.sqliteRepo.reset()
-        /*const accessToken = await this.getAccessTokenService.execute()
+        //this.sqliteRepo.reset()
+        const accessToken = await this.getAccessTokenService.execute()
         const endDate = Date.now() + 3600000
         const startDate = endDate - 24 * 3600000
-        const siteStatusPayload = new CommandStatePayload('549dc472-496f-4e15-b99b-2fcd9a82ad03', '3887de53-a763-4b06-ac01-26fbee9b3369', startDate, endDate)
-        return await this.axiosRepo.commandStateRequest(accessToken, siteStatusPayload)
-
-        */
+        const siteStatusPayload = new CommandStatePayload('549dc472-496f-4e15-b99b-2fcd9a82ad03', 'a98696e9-1d54-44ae-9739-adbed533b1ae', startDate, endDate)
+        const res = await this.axiosRepo.commandStateRequest(accessToken, siteStatusPayload)
     }
 }

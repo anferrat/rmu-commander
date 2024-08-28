@@ -38,6 +38,7 @@ export const useConfigListItem = ({ siteId, companyId, configOn, configOff, user
     const [doneMessage, setDoneMessage] = useState<string>('')
     const [updating, setUpdating] = useState<boolean>(false)
     const [autoUpdate, setAutoUpdate] = useState<boolean>(false)
+    const [commandType, setCommandType] = useState<SendCommandTypes | null>(null)
     const connected = status !== null
     const commandStateTimestamp = useRef<number | null>(null)
 
@@ -47,7 +48,7 @@ export const useConfigListItem = ({ siteId, companyId, configOn, configOff, user
         const { response, isOk, error } = await getSiteStatus(siteId, companyId)
         if (isOk) {
             const { siteState, commandState } = response!
-            const { siteName, groupName, onFirst, doneMessage, status, on, off, groupId } = convertDataToStateValues(commandState, siteState)
+            const { siteName, groupName, onFirst, doneMessage, status, on, off, groupId, commandType } = convertDataToStateValues(commandState, siteState)
             setOnOff({ on, off })
             setStatus(status)
             setSiteName(siteName)
@@ -56,6 +57,7 @@ export const useConfigListItem = ({ siteId, companyId, configOn, configOff, user
             setDoneMessage(doneMessage)
             setGroupId(groupId)
             setUpdating(false)
+            setCommandType(commandType)
             commandStateTimestamp.current === null
         }
         else
@@ -70,6 +72,7 @@ export const useConfigListItem = ({ siteId, companyId, configOn, configOff, user
             const { isOk, error, response } = await sendCommand(sendCommandPayload)
             if (isOk) {
                 setStatus(SiteStatus.AWT)
+                setDoneMessage('Queued')
                 setAutoUpdate(response!)
             }
             else
@@ -105,6 +108,7 @@ export const useConfigListItem = ({ siteId, companyId, configOn, configOff, user
                         onConnect()
                     }
                     else {
+                        setCommandType(commandState.commandType)
                         setDoneMessage(commandState.message)
                         setUpdating(false)
                     }
@@ -141,6 +145,7 @@ export const useConfigListItem = ({ siteId, companyId, configOn, configOff, user
         doneMessage,
         updating,
         autoUpdate,
+        commandType,
         onConnect,
         onInterrupt,
         onTurnOn,

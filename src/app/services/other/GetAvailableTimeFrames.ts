@@ -14,7 +14,7 @@ export class GetAvailableTimeFrames {
     }
 
     async execute() {
-        const timestamp = await this.axiosRepo.getTimestamp() * 1000
+        const timestamp = await this.axiosRepo.getTimestamp()
         return Object.values(TimeSelectionOptions).map((option) => this.getTimeFrameService.execute(timestamp, option)).filter(timeFrame => timeFrame.endDate - timeFrame.startDate > this.MIN_TIME_GAP)
     }
 }

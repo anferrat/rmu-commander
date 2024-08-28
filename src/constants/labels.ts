@@ -1,4 +1,4 @@
-import { ControlButtons, SiteStatus, TimeSelectionOptions } from "./constants";
+import { ControlButtons, SendCommandTypes, SiteStatus, TimeSelectionOptions } from "./constants";
 
 export const SiteStatusLabels = Object.freeze({
     [SiteStatus.ON]: 'On',
@@ -25,4 +25,10 @@ export const TimeSelectionOptionLabels = Object.freeze({
     [TimeSelectionOptions.UNTIL_3_PM]: 'Until 3 PM',
     [TimeSelectionOptions.UNTIL_6_PM]: 'Until 6 PM',
     [TimeSelectionOptions.UNTIL_12_AM]: 'Until midnight'
+})
+
+export const SendCommanTypeLabels = Object.freeze({
+    [SendCommandTypes.SHUT_OFF]: 'Shutting off',
+    [SendCommandTypes.START_INTERRUPTING]: 'Starting interruption',
+    [SendCommandTypes.TURN_ON]: 'Turning on'
 })
