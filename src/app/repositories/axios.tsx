@@ -56,11 +56,6 @@ export interface GroupResponse {
 }
 
 
-
-
-
-
-
 export class AxiosRepository {
     commandStateResponseProcessor = new CommandStateResponseProcessor()
     siteStateResponseProcessor = new SiteStateResponseProcessor()
