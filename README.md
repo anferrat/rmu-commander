@@ -16,7 +16,7 @@ This is **UNOFFICIAL** client for corview.cloud web application for mobile devic
 
 ## Download
 
-Android apk file is available for download [here](https://github.com/anferrat/rmu-commander/releases/tag/v1.0)
+Android apk file is available for download [here](https://github.com/anferrat/rmu-commander/releases/tag/v1.0.1)
 
 ## Usage
 
