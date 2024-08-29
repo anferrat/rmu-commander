@@ -20,7 +20,7 @@ Android apk file is available for download [here](https://github.com/anferrat/rm
 
 ## Usage
 
-![screenshot](/assets/sh-1.png)
+![screenshot](/assets/sh-1.png | width=100)
 
 RMU commander allows to send On/Of/ContinuousInterruption commands to Mobiltex's Remote Monitoring Units (works with RMU3).
 
