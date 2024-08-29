@@ -42,12 +42,12 @@ export class GetSiteStatus {
         if (commandState.status === CommandStatus.AWAIT_CONFIRM)
             siteState.setStatus(SiteStatus.AWT)
         else if (commandState.status === CommandStatus.DONE_CONFIRMED || commandState.status === CommandStatus.DONE_NO_CONFIRM) {
-            const dif = commandState.completionDate! - timestamp
+            const dif = timestamp - commandState.completionDate!
             if (dif < 15000)
                 if (commandState.commandType !== null)
                     siteState.setStatus(this._getStatusFromCommandType(commandState.commandType))
         }
-
+        
         return {
             commandState,
             siteState
