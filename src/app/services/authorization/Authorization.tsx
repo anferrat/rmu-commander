@@ -29,15 +29,14 @@ export class Authorization {
     async execute(login: string, password: string, savePassword: boolean, autoLogin: boolean): Promise<void> {
         const isInternetOn: boolean = await this.networkRepo.checkConnection()
         if (isInternetOn) {
-            await Promise.all([
-                this.loginService.execute(login, password),
-            ])
+            const isTest = await this.loginService.execute(login, password)
+
             //Save credentials only if login successfull
             if (savePassword) {
                 const credentials = new Credentials(true, login, password)
                 await this.secureStorageRepo.setCredentials(credentials)
             }
-            await this.tokenService.execute(true)
+            await this.tokenService.execute(true, isTest)
 
         }
         else
@@ -62,7 +61,7 @@ export class Authorization {
                     //Token expired
                     //try to get new token with current credentials
                     await this.secureStorageRepo.removeAccessToken()
-                    await this.tokenService.execute(true)
+                    await this.tokenService.execute(true, false) // test access token will never (almost) expire
                 }
                 // Token was issued and it is valid
                 return true
@@ -74,8 +73,8 @@ export class Authorization {
                     if (username === null || password === null)
                         return false
                     try {
-                        await this.loginService.execute(username, password)
-                        await this.tokenService.execute(true)
+                        const isTest = await this.loginService.execute(username, password)
+                        await this.tokenService.execute(true, isTest)
                         return true
                     }
                     catch (er) {

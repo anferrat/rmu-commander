@@ -24,7 +24,7 @@ export class GetAccessToken {
 
     private async _wait() {
         return new Promise((resolve) => {
-            setTimeout(resolve, this.RETRY_TIME)
+            setTimeout(()=>resolve(''), this.RETRY_TIME)
         })
     }
 

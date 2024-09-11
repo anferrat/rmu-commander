@@ -142,7 +142,7 @@ export class AxiosRepository {
     }
 
 
-    async authorizeRequest(authPayload: AuthorizationPayload) {
+    async authorizeRequest(authPayload: AuthorizationPayload): Promise<string> {
         try {
             const queryString = authPayload.toString()
             const result = await this.axios({

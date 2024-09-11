@@ -15,24 +15,17 @@ export class TokenService {
         this.secureStorage = secureStorage
     }
 
-    private _genAuthPayload(isNew: boolean, codeVerifier: string): AuthorizationPayload {
+    private _genAuthPayload(isNew: boolean, isTest: boolean, codeVerifier: string): AuthorizationPayload {
         const state = this.crypto.createRandom(40)
         const nonce = this.crypto.createRandom(40)
         const codeChallenge = this.crypto.createCodeChallenge(codeVerifier)
-        return new AuthorizationPayload(isNew, nonce, state, codeChallenge)
+        return new AuthorizationPayload(isNew, nonce, state, codeChallenge, isTest)
     }
 
-    private async _wait(duration: number): Promise<void> {
-        return new Promise((resolve) => {
-            setTimeout(() => resolve(), duration)
-        })
-    }
-
-    async execute(isNew: boolean): Promise<void> {
+    async execute(isNew: boolean, isTest: boolean): Promise<void> {
         const codeVerifier: string = this.crypto.createRandom(67)
-        const code = await this.axiosRepo.authorizeRequest(this._genAuthPayload(isNew, codeVerifier))
+        const code = await this.axiosRepo.authorizeRequest(this._genAuthPayload(isNew, isTest, codeVerifier))
         const tokenPayload = new TokenPayload(isNew, codeVerifier, code)
-        await this._wait(1000)
         const accessToken: AccessToken = await this.axiosRepo.tokenRequest(tokenPayload)
         await this.secureStorage.setAccessToken(accessToken)
     }

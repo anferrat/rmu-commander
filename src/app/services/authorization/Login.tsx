@@ -11,10 +11,10 @@ export class Login {
 
     async execute(login: string, password: string) {
         const antiforgeryResponse = await this.axiosRepo.antiforgeryRequest()
+        const loginPayload: LoginPayload = new LoginPayload(login, password, antiforgeryResponse.verificationToken!, true)
         if (!antiforgeryResponse.isLoggedIn) {
-            const loginPayload: LoginPayload = new LoginPayload(login, password, antiforgeryResponse.verificationToken!, true)
             await this.axiosRepo.loginRequest(loginPayload)
         }
+        return loginPayload.isTest
     }
-
 }
