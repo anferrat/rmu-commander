@@ -15,7 +15,7 @@ export class LogoutService {
     async execute() {
         const accessToken: AccessToken = await this.secureStorage.getAccessToken()
         const { idToken } = accessToken
-        const logoutPayload = new LogoutPayload(idToken)
+        const logoutPayload = new LogoutPayload(idToken, accessToken.isTest)
         await Promise.all([
             this.axiosRepo.logout(logoutPayload),
             this.secureStorage.removeAccessToken()

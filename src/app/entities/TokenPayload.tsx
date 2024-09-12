@@ -4,6 +4,7 @@ export class TokenPayload {
     codeVerifier: string
     code: string
     redirectUri: string
+    isTest: boolean
 
 
     constructor(isNew: boolean, codeVerifier: string, code: string) {
@@ -12,6 +13,7 @@ export class TokenPayload {
         this.codeVerifier = codeVerifier
         this.code = code
         this.redirectUri = isNew ? 'https://www.corview.cloud/auth-return' : 'https://www.corview.cloud/silent-renew.html'
+        this.isTest = code === 'CODE'
     }
 
     toString(): string {

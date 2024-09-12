@@ -12,12 +12,12 @@ import { Company } from "../entities/corview.cloud/Company"
 import { Site } from "../entities/corview.cloud/Site"
 import { Group } from "../entities/corview.cloud/Group"
 import { CommandStatePayload } from "../entities/corview.cloud/CommandStatePayload"
-import { SiteStatus } from "../../constants/constants"
 import { SiteStatePayload } from "../entities/corview.cloud/SiteStatePayload"
-import { SiteState } from "../entities/corview.cloud/SiteState"
 import { SendCommandPayload } from "../entities/corview.cloud/SendCommandPayload"
 import { CommandHistoryResponse, CommandStateResponseProcessor } from "../utils/AxiosResponseProcessors/CommandStateResponseProcessor"
 import { SiteStateResponse, SiteStateResponseProcessor } from "../utils/AxiosResponseProcessors/SiteStateResponseProcessor"
+import { TestAuthRepository } from "./test/auth_test"
+import { TestApiRepo } from "./test/api_test"
 
 export interface CompanyResponse {
     data: {
@@ -59,6 +59,8 @@ export interface GroupResponse {
 export class AxiosRepository {
     commandStateResponseProcessor = new CommandStateResponseProcessor()
     siteStateResponseProcessor = new SiteStateResponseProcessor()
+    testAuth = new TestAuthRepository()
+    testApi = new TestApiRepo()
     AUTHORIZATION_ENDPOINT: string = 'https://account.corview.cloud/connect/authorize'
     TOKEN_ENDPOINT: string = 'https://account.corview.cloud/connect/token'
     END_SESSION_ENDPOINT: string = 'https://account.corview.cloud/connect/endsession'
@@ -118,6 +120,10 @@ export class AxiosRepository {
     async loginRequest(loginPayload: LoginPayload) {
         //Goal of login request is to create cookies for subsequent authorize request. 
         try {
+            //0. Check if test credentials were entered
+            if (loginPayload.isTest)
+                return await this.testAuth.loginRequest()
+
             //1. Loggin in with credentials. Cookies will be created on success
             const response = await this.axios({
                 method: 'post',
@@ -144,6 +150,9 @@ export class AxiosRepository {
 
     async authorizeRequest(authPayload: AuthorizationPayload): Promise<string> {
         try {
+            if (authPayload.isTest)
+                return this.testAuth.authorizeRequest()
+
             const queryString = authPayload.toString()
             const result = await this.axios({
                 method: 'get',
@@ -162,6 +171,9 @@ export class AxiosRepository {
 
     async tokenRequest(tokenPayload: TokenPayload) {
         try {
+            if (tokenPayload.isTest)
+                return this.testAuth.tokenRequest()
+
             const result = await this.axios({
                 method: 'POST',
                 url: this.TOKEN_ENDPOINT,
@@ -186,6 +198,11 @@ export class AxiosRepository {
 
     async logout(logoutPayload: LogoutPayload) {
         try {
+            if (logoutPayload.isTest) {
+                await this.testAuth.logout()
+                return
+            }
+
             await axios({
                 method: 'get',
                 url: this.END_SESSION_ENDPOINT + '?' + logoutPayload.toString(),
@@ -222,6 +239,9 @@ export class AxiosRepository {
 
     async userInfo(accessToken: AccessToken): Promise<UserInfo> {
         try {
+            if (accessToken.isTest) {
+                return this.testApi.userInfo()
+            }
             const { data } = await axios({
                 method: 'get',
                 url: 'https://account.corview.cloud/connect/userinfo',
@@ -242,6 +262,8 @@ export class AxiosRepository {
 
     async companyRequest(accessToken: AccessToken): Promise<Company[]> {
         try {
+            if (accessToken.isTest)
+                return this.testApi.companyRequest()
             const { data } = await axios<any, AxiosResponse<CompanyResponse>>({
                 method: 'get',
                 url: 'https://api.corview.cloud/v1/Company?$orderby=name&$select=id%2Cname',
@@ -261,6 +283,9 @@ export class AxiosRepository {
 
     async groupRequest(accessToken: AccessToken, companyId: string): Promise<Group[]> {
         try {
+            if (accessToken.isTest)
+                return this.testApi.groupRequest(companyId)
+
             const { data } = await axios<any, AxiosResponse<GroupResponse>>({
                 method: 'get',
                 url: `https://api.corview.cloud/v1/Group?$filter=(groupType%2Fid%20eq%20%27Standard%27)&$orderby=name&$select=id%2Cname%2CgroupType%2CrmuCount&$expand=groupType(%24select%3DdisplayName%2Cid)&CompanyIds=${companyId}`,
@@ -282,6 +307,9 @@ export class AxiosRepository {
 
     async siteRequest(accessToken: AccessToken, companyId: string): Promise<Site[]> {
         try {
+            if (accessToken.isTest)
+                return this.testApi.siteRequest(companyId)
+
             const { data } = await axios<any, AxiosResponse<SiteResponse>>({
                 method: 'get',
                 url: `https://api.corview.cloud/v1/Site?$filter=(controlEnabled%20eq%20true)%20and%20(company%2Fid%20eq%20%27${companyId}%27)&$select=id%2Cname%2Cnumber%2Cactive%2ChasGps%2Crmu%2Cgroup%2ChardwareType%2CinterruptCycleOrder%2CcontrolEnabled%2CremoteLimitsCapable%2CremoteLimitsEnabled%2Cesn%2CcontrolComments%2CremoteLimitsIsExpired%2Cgroups&$expand=rmu(%24select%3Did%2CdisplayName)%2ChardwareType(%24select%3Did%2CdisplayName)%2Cgroup(%24select%3Did%2CdisplayName)%2CinterruptCycleOrder(%24select%3Did%2CdisplayName)%2Cgroups(%24select%3Did)&Active=true`,
@@ -301,6 +329,9 @@ export class AxiosRepository {
 
     async commandStateRequest(accessToken: AccessToken, commandStatePayload: CommandStatePayload) {
         try {
+            if (accessToken.isTest)
+                return this.testApi.commandStateRequest(commandStatePayload)
+
             const { data, headers } = await axios<any, AxiosResponse<CommandHistoryResponse>>({
                 method: 'get',
                 url: `https://api.corview.cloud/v1/MsgCommand/GetCommandHistory?${commandStatePayload.toString()}`,
@@ -320,6 +351,9 @@ export class AxiosRepository {
 
     async siteStateRequest(accessToken: AccessToken, siteStatePayload: SiteStatePayload) {
         try {
+            if (accessToken.isTest)
+                return this.testApi.siteStateRequest(siteStatePayload)
+
             const { data } = await axios<any, AxiosResponse<SiteStateResponse>>({
                 method: 'get',
                 url: `https://api.corview.cloud/v1/SiteStatus?${siteStatePayload.toString()}`,
@@ -342,6 +376,9 @@ export class AxiosRepository {
 
     async sendCommandRequest(accessToken: AccessToken, sendCommandPayload: SendCommandPayload) {
         try {
+            if (accessToken.isTest)
+                return this.testApi.sendCommandRequest(sendCommandPayload)
+            
             await axios<any, AxiosResponse>({
                 method: 'post',
                 url: sendCommandPayload.getUrl(),

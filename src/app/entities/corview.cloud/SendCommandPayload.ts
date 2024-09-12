@@ -24,14 +24,14 @@ interface PayloadType {
 
 
 export class SendCommandPayload {
-    private commandType: SendCommandTypes
+    commandType: SendCommandTypes
     private userId: string
     siteId: string
     private groupId: string
     companyId: string
-    private onFirst: boolean
-    private on?: number
-    private off?: number
+    onFirst: boolean
+    on?: number
+    off?: number
     private startTime?: number
     private endTime?: number
     private note?: string

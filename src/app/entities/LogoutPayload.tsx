@@ -1,10 +1,12 @@
 export class LogoutPayload {
     idTokenHint: string
     postLogoutRedirectUri: string
+    isTest: boolean
 
-    constructor(idToken: string) {
+    constructor(idToken: string, isTest: boolean) {
         this.idTokenHint = idToken
         this.postLogoutRedirectUri = 'https://corview.cloud'
+        this.isTest = isTest
     }
 
     toString(): string {
