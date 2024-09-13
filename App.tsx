@@ -2,7 +2,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { Provider } from 'react-redux';
 import {
-  SafeAreaView,
   StatusBar,
 } from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
@@ -13,6 +12,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import global from './src/stores/global';
 import { IconRegistry } from '@ui-kitten/components';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
+import SplashScreen from 'react-native-splash-screen';
 install()
 
 const store = configureStore({
@@ -32,7 +32,8 @@ function App(): React.JSX.Element {
             barStyle={'light-content'}
             translucent={true}
             backgroundColor={'transparent'} />
-          <NavigationContainer>
+          <NavigationContainer
+            onReady={SplashScreen.hide}>
             <AppNavigator />
           </NavigationContainer>
         </Provider>
