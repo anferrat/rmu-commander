@@ -63,9 +63,10 @@ export const useSiteSelection = ({ hideModal, onSelectSite, visible }: UseSiteSe
     }, [visible])
 
     useEffect(() => {
-        const loadData = async () => {
-            setLoading(true)
-            if (selectedCompanyIndex !== null && companies[selectedCompanyIndex!]) {
+        if (selectedCompanyIndex !== null && companies[selectedCompanyIndex!]) {
+            const loadData = async () => {
+                setLoading(true)
+
                 const { response, isOk, error } = await getSiteSelectionData(companies[selectedCompanyIndex!].id)
                 if (isOk) {
                     const { sites, groups } = response!
@@ -76,10 +77,10 @@ export const useSiteSelection = ({ hideModal, onSelectSite, visible }: UseSiteSe
                     errorHandler(error!)
                     hideModal()
                 }
+                setLoading(false)
             }
-            setLoading(false)
+            loadData()
         }
-        loadData()
     }, [selectedCompanyIndex, companies])
 
     useEffect(() => {
